@@ -40,7 +40,7 @@ const Login = () => {
             <Ionicons name="eye-off-outline" size={24} color="black" onPress={() => setShowPassword(!showPassword)} style={{ display: showPassword ? "flex" : 'none' }} />
           </View>
           <View >
-            <TouchableOpacity style={styles.signupBtn}>
+            <TouchableOpacity style={styles.signupBtn} onPress={() => router.push("/(tabs)/home")}>
               <Text style={styles.signupBtnText}>Login</Text>
             </TouchableOpacity>
           </View>
