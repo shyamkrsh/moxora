@@ -4,6 +4,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Comment from './Comment';
 
+
 const { width, height } = Dimensions.get("window");
 
 let halfWidth = width / 2;
@@ -11,6 +12,14 @@ let halfWidth = width / 2;
 const PostCard = ({ profileImage }) => {
 
     const [showComments, setShowComments] = useState(false);
+    const [likes, setLikes] = useState(0);
+    const [liked, setLiked] = useState(false);
+    const [commentCount, setCommentCount] = useState(0);
+
+    let handleLikes = () => {
+        setLikes(likes + 1);
+        setLiked(!liked);
+    }
 
     return (
         <View style={styles.postCardContainer}>
@@ -24,7 +33,7 @@ const PostCard = ({ profileImage }) => {
                 </View>
             </View>
             <View style={styles.msg}>
-                <Text>Just landed in Bali, Indonesia, and I’m already in awe of this paradise! 🌴✨ From the breathtaking Tegallalang Rice Terraces to the crystal-clear waters of Nusa Penida, every corner of this island feels like a dream. <Text style={{ color: 'gray', fontSize: 16, fontWeight: 600 }}>more..</Text>
+                <Text>Just landed in Bali, Indonesia, and I’m already in awe of this paradise! 🌴✨ From the breathtaking Tegallalang Rice Terraces to the crystal-clear waters of Nusa Penida, every corner of this island feels like a dream. <Text style={{ color: 'gray', fontSize: 16, fontWeight: 400 }}>more..</Text>
                 </Text>
                 <View style={{ flexDirection: 'row' }}>
                     <View>
@@ -39,8 +48,9 @@ const PostCard = ({ profileImage }) => {
             <View style={styles.actionBtn}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 50 }}>
                     <View style={styles.btnWithCount}>
-                        <AntDesign name="like2" size={24} color="#8b8c8b" />
-                        <Text>23</Text>
+                        <AntDesign name="like2" size={24} color="#8b8c8b" onPress={handleLikes} style={{display : liked ? "none" : "flex"}} />
+                        <AntDesign name="like1" size={24} color="#8b8c8b" onPress={handleLikes} style={{display : liked ? "flex" : "none"}}/>
+                        <Text>{likes}</Text>
                     </View>
                     <Pressable style={styles.btnWithCount} onPress={() => setShowComments(!showComments)}>
                         <MaterialCommunityIcons name="comment-text-outline" size={24} color="#8b8c8b" />
@@ -50,7 +60,7 @@ const PostCard = ({ profileImage }) => {
                 <MaterialCommunityIcons name="share-variant-outline" size={24} color='#8b8c8b' />
             </View>
 
-            <View style={[styles.commentContainer, {display : showComments ? "flex" : "none"}]}>
+            <View style={[styles.commentContainer, { display: showComments ? "flex" : "none" }]}>
                 <Comment profileImage={profileImage} />
                 <Comment profileImage={profileImage} />
                 <Comment profileImage={profileImage} />
@@ -85,7 +95,9 @@ let styles = StyleSheet.create({
         fontWeight: 500
     },
     postedDate: {
-        fontSize: 12
+        fontSize: 12,
+        color: 'gray',
+        fontWeight: 500
     },
     msg: {
         marginTop: 15,

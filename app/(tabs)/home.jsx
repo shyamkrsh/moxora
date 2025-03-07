@@ -22,7 +22,7 @@ const Home = () => {
         renderItem={({ item }) => <PostCard profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
-          <View style={styles.followersContainer}>
+          <View style={styles.followersContainer}>                                          
             <View style={styles.mystory}>
               <View style={styles.mystoryImage}>
                 <Feather name="plus" size={30} color="#4e4f4e" />
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 20,
+    padding: 15,
     backgroundColor : 'white'
   },
   profWithLogo: {
