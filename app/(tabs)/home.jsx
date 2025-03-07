@@ -1,11 +1,23 @@
 import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FollowerIconCard from '../../components/FollowerIconCard';
 import Feather from '@expo/vector-icons/Feather';
 import PostCard from '../../components/PostCard';
+import axios from 'axios'
 
 const Home = () => {
+
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/api/post/all").then((res) => {
+      console.log(res.data)
+    }).catch((err) => {
+      console.log(err);
+    })
+  }, [])
+
+
   return (
     <>
       <View style={styles.header}>
@@ -22,7 +34,7 @@ const Home = () => {
         renderItem={({ item }) => <PostCard profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
-          <View style={styles.followersContainer}>                                          
+          <View style={styles.followersContainer}>
             <View style={styles.mystory}>
               <View style={styles.mystoryImage}>
                 <Feather name="plus" size={30} color="#4e4f4e" />
@@ -53,7 +65,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 15,
-    backgroundColor : 'white'
+    backgroundColor: 'white'
   },
   profWithLogo: {
     flexDirection: 'row',
@@ -83,7 +95,7 @@ const styles = StyleSheet.create({
     gap: 20,
     paddingHorizontal: 20,
     // backgroundColor: '#e3e3e3',
-    backgroundColor : 'transparent'
+    backgroundColor: 'transparent'
   },
   mystory: {
     flexDirection: 'column',
