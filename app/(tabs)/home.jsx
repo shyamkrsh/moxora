@@ -25,37 +25,23 @@ const Home = () => {
     <>
       <View style={styles.header}>
         <View style={styles.profWithLogo}>
+          <Text style={styles.logoText}>Moxora</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+          <Ionicons name="add-outline" size={24} color="#515452" style={styles.searchIcon} />
+          <Ionicons name="search-outline" size={24} color="#515452" style={styles.searchIcon} />
           <Pressable onPress={() => router.navigate("../profile")}>
             <Image source={{ uri: "https://i.ibb.co/VYdnkZnj/profile.jpg" }} style={styles.profileImage} />
           </Pressable>
-          <Text style={styles.logoText}>Moxora</Text>
         </View>
-        <Ionicons name="search" size={24} color="#515452" style={styles.searchIcon} />
       </View>
-
+      <View style={{ width: "100%", height: 1, backgroundColor: '#e8e6e1' }}></View>
       <FlatList
         data={[1, 2, 3, 4, 5, 6, 7, 8, 9]} // Post data
         keyExtractor={(item) => item.toString()}
         renderItem={({ item }) => <PostCard profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
         showsVerticalScrollIndicator={false}
-        ListHeaderComponent={() => (
-          <View style={styles.followersContainer}>
-            <View style={styles.mystory}>
-              <View style={styles.mystoryImage}>
-                <Feather name="plus" size={30} color="#4e4f4e" />
-              </View>
-              <Text style={{ color: '#6b6e6c', fontWeight: '600' }}>You</Text>
-            </View>
-            <FlatList
-              horizontal
-              data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]}
-              keyExtractor={(item) => item.toString()}
-              renderItem={({ item }) => <FollowerIconCard profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 10 }}
-            />
-          </View>
-        )}
+
       />
     </>
   );

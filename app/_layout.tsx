@@ -23,6 +23,10 @@ export default function RootLayout() {
           name="post/viewPost"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="message/message"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </>
   )

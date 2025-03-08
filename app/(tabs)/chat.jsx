@@ -20,21 +20,9 @@ const Chat = () => {
 
         <View>
           <FlatList
-            data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]}
+            data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
             keyExtractor={(item) => item.toString()}
-            renderItem={({ item }) => <ContactCard profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rajesh Kumar"} message={"Hi, shyam how are you bro??"} date={"3d ago"}/>}
-            ListHeaderComponent={() => (
-              <View style={styles.followersContainer}>
-                <FlatList
-                  horizontal
-                  data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]}
-                  keyExtractor={(item) => item.toString()}
-                  renderItem={({ item }) => <FollowerIconCard profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 10 }}
-                />
-              </View>
-            )}
+            renderItem={({ item }) => <ContactCard profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rajesh Kumar"} message={"Hi, shyam how are you bro??"} date={"3d ago"} />}
           />
         </View>
 
@@ -59,7 +47,7 @@ let styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   pageTitleText: {
-    color : '#454745',
+    color: '#454745',
     fontSize: 25,
     fontWeight: 600
   },
