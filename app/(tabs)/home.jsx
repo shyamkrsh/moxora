@@ -1,13 +1,16 @@
-import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, Pressable } from 'react-native';
 import React, { useEffect } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FollowerIconCard from '../../components/FollowerIconCard';
 import Feather from '@expo/vector-icons/Feather';
 import PostCard from '../../components/PostCard';
 import axios from 'axios'
+import { useRouter } from 'expo-router';
+
 
 const Home = () => {
 
+  const router = useRouter();
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/post/all").then((res) => {
@@ -22,7 +25,9 @@ const Home = () => {
     <>
       <View style={styles.header}>
         <View style={styles.profWithLogo}>
-          <Image source={{ uri: "https://i.ibb.co/VYdnkZnj/profile.jpg" }} style={styles.profileImage} />
+          <Pressable onPress={() => router.navigate("../profile")}>
+            <Image source={{ uri: "https://i.ibb.co/VYdnkZnj/profile.jpg" }} style={styles.profileImage} />
+          </Pressable>
           <Text style={styles.logoText}>Moxora</Text>
         </View>
         <Ionicons name="search" size={24} color="#515452" style={styles.searchIcon} />
@@ -78,8 +83,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   logoText: {
-    fontSize: 25,
-    fontWeight: '600',
+    fontSize: 23,
+    fontWeight: '500',
     color: '#6e736f',
   },
   searchIcon: {

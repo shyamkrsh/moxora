@@ -4,12 +4,28 @@ import { Stack, useRouter } from 'expo-router'
 import { StatusBar } from 'react-native'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import axios from 'axios';
 
 
 const Signup = () => {
 
+  const [emailOrMobile, setEmailOrMobile] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setshowConfirmPassword] = useState(false);
+
+  let handleSubmit = () => {
+    console.log(emailOrMobile, " ", password);
+    axios.post("http://localhost:8080/api/user/register",
+      {
+        emailOrMobile, password
+      }
+    ).then((res) => {
+      console.log(res.data)
+    }).catch((err) => {
+      console.log(err.message);
+    })
+  }
 
   const router = useRouter();
   return (
@@ -26,20 +42,22 @@ const Signup = () => {
         </View>
 
         <View style={styles.signupForm}>
+
           <View style={styles.input}>
             <View style={styles.inputIcons}>
               <MaterialCommunityIcons name="email-outline" size={25} color="#4d5250" />
-              <TextInput placeholder='email or mobile' style={styles.inputField} />
+              <TextInput placeholder='email or mobile' style={styles.inputField} onChangeText={(value) => setEmailOrMobile(value)} />
             </View>
           </View>
           <View style={styles.input}>
             <View style={styles.inputIcons}>
               <Ionicons name="key-outline" size={25} color="black" />
-              <TextInput placeholder='password' secureTextEntry={showPassword ? false : true} style={styles.inputField} />
+              <TextInput placeholder='password' secureTextEntry={showPassword ? false : true} style={styles.inputField} onChangeText={(value) => setPassword(value)} />
             </View>
             <Ionicons name="eye-outline" size={24} color="black" onPress={() => setShowPassword(!showPassword)} style={{ display: showPassword ? "none" : 'flex' }} />
             <Ionicons name="eye-off-outline" size={24} color="black" onPress={() => setShowPassword(!showPassword)} style={{ display: showPassword ? "flex" : 'none' }} />
           </View>
+
           <View style={styles.input}>
             <View style={styles.inputIcons}>
               <Ionicons name="key-outline" size={25} color="black" />
@@ -49,7 +67,7 @@ const Signup = () => {
             <Ionicons name="eye-off-outline" size={24} color="black" onPress={() => setshowConfirmPassword(!showConfirmPassword)} style={{ display: showConfirmPassword ? "flex" : 'none' }} />
           </View>
           <View >
-            <TouchableOpacity style={styles.signupBtn}>
+            <TouchableOpacity style={styles.signupBtn} onPress={handleSubmit}>
               <Text style={styles.signupBtnText}>Sign up</Text>
             </TouchableOpacity>
           </View>
@@ -100,8 +118,8 @@ let styles = StyleSheet.create({
   },
   signupForm: {
     marginTop: 50,
-    flexDirection : 'column',
-    alignItems : 'center'
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   input: {
     width: 320,

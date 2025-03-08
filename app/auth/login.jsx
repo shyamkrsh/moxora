@@ -4,12 +4,31 @@ import { Stack, useRouter } from 'expo-router'
 import { StatusBar } from 'react-native'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
+import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
 
+  const [emailOrMobile, setEmailOrMobile] = useState("");
+  const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+
+  let handleSubmit = () => {
+    console.log(emailOrMobile, " ", password);
+    axios.post("http://localhost:8080/api/user/login", {
+      emailOrMobile, password
+    }).then(async (res) => {
+      if (res?.data?.success) {
+        await AsyncStorage.setItem("token", res?.data?.token);
+        await AsyncStorage.setItem("userId", res?.data?.userId);
+        router.push("/(tabs)/home");
+      }
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
 
   return (
     <>
@@ -23,18 +42,17 @@ const Login = () => {
         <View>
           <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
         </View>
-
         <View style={styles.signupForm}>
           <View style={styles.input}>
             <View style={styles.inputIcons}>
               <MaterialCommunityIcons name="email-outline" size={25} color="#4d5250" />
-              <TextInput placeholder='email or mobile' style={styles.inputField} />
+              <TextInput placeholder='email or mobile' importantForAutofill="no" style={styles.inputField} onChangeText={(value) => setEmailOrMobile(value)} />
             </View>
           </View>
           <View style={styles.input}>
             <View style={styles.inputIcons}>
               <Ionicons name="key-outline" size={25} color="black" />
-              <TextInput placeholder='password' secureTextEntry={showPassword ? false : true} style={styles.inputField} />
+              <TextInput placeholder='password' importantForAutofill="no" secureTextEntry={showPassword ? false : true} style={styles.inputField} onChangeText={(value) => setPassword(value)} />
             </View>
             <Ionicons name="eye-outline" size={24} color="black" onPress={() => setShowPassword(!showPassword)} style={{ display: showPassword ? "none" : 'flex' }} />
             <Ionicons name="eye-off-outline" size={24} color="black" onPress={() => setShowPassword(!showPassword)} style={{ display: showPassword ? "flex" : 'none' }} />
@@ -72,8 +90,8 @@ let styles = StyleSheet.create({
   },
   signupForm: {
     marginTop: 110,
-    flexDirection : 'column',
-    alignItems : 'center'
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   input: {
     width: 320,

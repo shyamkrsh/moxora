@@ -3,7 +3,7 @@ import React from 'react'
 
 const FollowerIconCard = ({profileImage, name}) => {
     return (
-        <View style={styles.cardContainer}>
+        <View style={styles.cardContainer} >
             <Image source={{ uri: profileImage }} style={styles.followerImage} />
             <Text style={{color : '#6b6e6c', fontWeight : 400}}>{name}</Text>
         </View>

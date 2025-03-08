@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Comment from './Comment';
+import { useRouter } from 'expo-router'
 
 
 const { width, height } = Dimensions.get("window");
@@ -16,57 +17,61 @@ const PostCard = ({ profileImage }) => {
     const [liked, setLiked] = useState(false);
     const [commentCount, setCommentCount] = useState(0);
 
+    const router = useRouter();
+
     let handleLikes = () => {
         setLikes(likes + 1);
         setLiked(!liked);
     }
 
     return (
-        <View style={styles.postCardContainer}>
-            <View style={styles.postOwnerInfo}>
-                <View>
-                    <Image source={{ uri: profileImage }} style={styles.profileImage} />
-                </View>
-                <View style={styles.ownerDetails}>
-                    <Text style={styles.ownerName}>Rakesh Kumar</Text>
-                    <Text style={styles.postedDate}>March 06, 2025</Text>
-                </View>
-            </View>
-            <View style={styles.msg}>
-                <Text>Just landed in Bali, Indonesia, and I’m already in awe of this paradise! 🌴✨ From the breathtaking Tegallalang Rice Terraces to the crystal-clear waters of Nusa Penida, every corner of this island feels like a dream. <Text style={{ color: 'gray', fontSize: 16, fontWeight: 400 }}>more..</Text>
-                </Text>
-                <View style={{ flexDirection: 'row' }}>
+        <Pressable onPress={() => router.push({ pathname: "/post/viewPost", params: { profileImage } })}>
+            <View style={styles.postCardContainer} >
+                <View style={styles.postOwnerInfo}>
                     <View>
-                        <Image source={require("../assets/images/img1.jpg")} style={styles.img1} />
+                        <Image source={{ uri: profileImage }} style={styles.profileImage} />
                     </View>
-                    <View style={{ flexDirection: 'column', height: 180 }}>
-                        <Image source={require("../assets/images/img2.jpg")} style={styles.img2} />
-                        <Image source={require("../assets/images/img3.jpg")} style={styles.img3} />
+                    <View style={styles.ownerDetails}>
+                        <Text style={styles.ownerName}>Rakesh Kumar</Text>
+                        <Text style={styles.postedDate}>March 06, 2025</Text>
                     </View>
                 </View>
-            </View>
-            <View style={styles.actionBtn}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 50 }}>
-                    <View style={styles.btnWithCount}>
-                        <AntDesign name="like2" size={24} color="#8b8c8b" onPress={handleLikes} style={{display : liked ? "none" : "flex"}} />
-                        <AntDesign name="like1" size={24} color="#8b8c8b" onPress={handleLikes} style={{display : liked ? "flex" : "none"}}/>
-                        <Text>{likes}</Text>
+                <View style={styles.msg}>
+                    <Text>Just landed in Bali, Indonesia, and I’m already in awe of this paradise! 🌴✨ From the breathtaking Tegallalang Rice Terraces to the crystal-clear waters of Nusa Penida, every corner of this island feels like a dream. <Text style={{ color: 'gray', fontSize: 16, fontWeight: 400 }}>more..</Text>
+                    </Text>
+                    <View style={{ flexDirection: 'row' }}>
+                        <View>
+                            <Image source={require("../assets/images/img1.jpg")} style={styles.img1} />
+                        </View>
+                        <View style={{ flexDirection: 'column', height: 180 }}>
+                            <Image source={require("../assets/images/img2.jpg")} style={styles.img2} />
+                            <Image source={require("../assets/images/img3.jpg")} style={styles.img3} />
+                        </View>
                     </View>
-                    <Pressable style={styles.btnWithCount} onPress={() => setShowComments(!showComments)}>
-                        <MaterialCommunityIcons name="comment-text-outline" size={24} color="#8b8c8b" />
-                        <Text>25</Text>
-                    </Pressable>
                 </View>
-                <MaterialCommunityIcons name="share-variant-outline" size={24} color='#8b8c8b' />
-            </View>
+                <View style={styles.actionBtn}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 50 }}>
+                        <View style={styles.btnWithCount}>
+                            <AntDesign name="like2" size={24} color="#8b8c8b" onPress={handleLikes} style={{ display: liked ? "none" : "flex" }} />
+                            <AntDesign name="like1" size={24} color="#8b8c8b" onPress={handleLikes} style={{ display: liked ? "flex" : "none" }} />
+                            <Text>{likes}</Text>
+                        </View>
+                        <Pressable style={styles.btnWithCount} onPress={() => setShowComments(!showComments)}>
+                            <MaterialCommunityIcons name="comment-text-outline" size={24} color="#8b8c8b" />
+                            <Text>25</Text>
+                        </Pressable>
+                    </View>
+                    <MaterialCommunityIcons name="share-variant-outline" size={24} color='#8b8c8b' />
+                </View>
 
-            <View style={[styles.commentContainer, { display: showComments ? "flex" : "none" }]}>
-                <Comment profileImage={profileImage} />
-                <Comment profileImage={profileImage} />
-                <Comment profileImage={profileImage} />
-                <Comment profileImage={profileImage} />
+                <View style={[styles.commentContainer, { display: showComments ? "flex" : "none" }]}>
+                    <Comment profileImage={profileImage} />
+                    <Comment profileImage={profileImage} />
+                    <Comment profileImage={profileImage} />
+                    <Comment profileImage={profileImage} />
+                </View>
             </View>
-        </View>
+        </Pressable>
     )
 }
 export default PostCard
