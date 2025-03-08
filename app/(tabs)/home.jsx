@@ -28,7 +28,7 @@ const Home = () => {
           <Text style={styles.logoText}>Moxora</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-          <Ionicons name="add-outline" size={24} color="#515452" style={styles.searchIcon} />
+          <Ionicons name="add-outline" size={24} color="#515452" style={styles.searchIcon} onPress={() => router.push("/post/createPost")} />
           <Ionicons name="search-outline" size={24} color="#515452" style={styles.searchIcon} />
           <Pressable onPress={() => router.navigate("../profile")}>
             <Image source={{ uri: "https://i.ibb.co/VYdnkZnj/profile.jpg" }} style={styles.profileImage} />
