@@ -17,7 +17,7 @@ const Login = () => {
 
   let handleSubmit = () => {
     console.log(emailOrMobile, " ", password);
-    axios.post("http://localhost:8080/api/user/login", {
+    axios.post("http://192.168.152.18:8080/api/user/login", {
       emailOrMobile, password
     }).then(async (res) => {
       if (res?.data?.success) {
@@ -58,7 +58,7 @@ const Login = () => {
             <Ionicons name="eye-off-outline" size={24} color="black" onPress={() => setShowPassword(!showPassword)} style={{ display: showPassword ? "flex" : 'none' }} />
           </View>
           <View >
-            <TouchableOpacity style={styles.signupBtn} onPress={() => router.push("/(tabs)/home")}>
+            <TouchableOpacity style={styles.signupBtn} onPress={handleSubmit}>
               <Text style={styles.signupBtnText}>Login</Text>
             </TouchableOpacity>
           </View>

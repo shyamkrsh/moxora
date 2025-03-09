@@ -13,21 +13,22 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setshowConfirmPassword] = useState(false);
+  const router = useRouter();
 
   let handleSubmit = () => {
     console.log(emailOrMobile, " ", password);
-    axios.post("http://localhost:8080/api/user/register",
+    axios.post("http://192.168.152.18:8080/api/user/register",
       {
         emailOrMobile, password
       }
     ).then((res) => {
       console.log(res.data)
+      router.navigate("./login")
     }).catch((err) => {
       console.log(err.message);
     })
   }
 
-  const router = useRouter();
   return (
     <>
       <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />

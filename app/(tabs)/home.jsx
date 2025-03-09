@@ -13,7 +13,7 @@ const Home = () => {
   const router = useRouter();
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/post/all").then((res) => {
+    axios.get("http://192.168.152.18:8080/api/post/all").then((res) => {
       console.log(res.data)
     }).catch((err) => {
       console.log(err);
@@ -25,7 +25,7 @@ const Home = () => {
     <>
       <View style={styles.header}>
         <View style={styles.profWithLogo}>
-          <Text style={styles.logoText}>Moxora</Text>
+          <Text style={styles.logoText}>𝑴𝒐𝒙𝒐𝒓𝒂</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
           <Ionicons name="add-outline" size={24} color="#515452" style={styles.searchIcon} onPress={() => router.push("/post/createPost")} />
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 15,
+    padding: 10,
     backgroundColor: 'white'
   },
   profWithLogo: {
@@ -69,37 +69,14 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   logoText: {
-    fontSize: 23,
+    fontSize: 25,
     fontWeight: '500',
-    color: '#6e736f',
+    color: '#050412',
   },
   searchIcon: {
     backgroundColor: '#d9dbda',
     padding: 8,
     borderRadius: 100,
   },
-  followersContainer: {
-    width: '100%',
-    height: 120,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 20,
-    paddingHorizontal: 20,
-    // backgroundColor: '#e3e3e3',
-    backgroundColor: 'transparent'
-  },
-  mystory: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mystoryImage: {
-    width: 50,
-    height: 50,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderRadius: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
 });

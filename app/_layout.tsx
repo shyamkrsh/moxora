@@ -27,6 +27,10 @@ export default function RootLayout() {
           name="message/message"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="post/createPost"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </>
   )

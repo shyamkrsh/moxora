@@ -26,17 +26,18 @@ const ViewPost = () => {
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
             {/* ScrollView to make the content scrollable */}
-            <ScrollView 
-                style={{ flex: 1 }} 
+            <View style={styles.header}>
+                <AntDesign name="left" size={24} color="black" onPress={() => router.back()} />
+                <Ionicons name="search" size={24} color="#515452" style={styles.searchIcon} />
+            </View>
+            <View style={{ width: "100%", height: 1, backgroundColor: '#e8e6e1' }}></View>
+            <ScrollView
+                style={{ flex: 1 }}
                 contentContainerStyle={{ flexGrow: 1, paddingBottom: 70 }}  // Allows scrolling
                 keyboardShouldPersistTaps="handled"
             >
                 <View style={styles.postCardContainer}>
                     {/* Header */}
-                    <View style={styles.header}>
-                        <AntDesign name="left" size={24} color="black" onPress={() => router.back()} />
-                        <Ionicons name="search" size={24} color="#515452" style={styles.searchIcon} />
-                    </View>
 
                     {/* Post Owner Info */}
                     <View style={styles.postOwnerInfo}>
@@ -50,7 +51,7 @@ const ViewPost = () => {
                     {/* Post Content */}
                     <View style={styles.msg}>
                         <Text>
-                            Just landed in Bali, Indonesia, and I’m already in awe of this paradise! 🌴✨ From the breathtaking Tegallalang Rice Terraces to the crystal-clear waters of Nusa Penida, every corner of this island feels like a dream. 
+                            Just landed in Bali, Indonesia, and I’m already in awe of this paradise! 🌴✨ From the breathtaking Tegallalang Rice Terraces to the crystal-clear waters of Nusa Penida, every corner of this island feels like a dream.
                             <Text style={{ color: 'gray', fontSize: 16, fontWeight: '400' }}> more..</Text>
                         </Text>
                         <View style={{ flexDirection: 'row' }}>
@@ -108,11 +109,11 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     header: {
-        marginTop: 35,
+        marginTop: 30,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 15,
+        padding: 10,
         backgroundColor: 'white',
     },
     searchIcon: {
