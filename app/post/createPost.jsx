@@ -26,7 +26,7 @@ const PostForm = () => {
             type: fileTypeFinal,
             name: fileType === "video" ? "upload.mp4" : "upload.jpg"
         });
-        data.append("upload_preset", "moxora"); 
+        data.append("upload_preset", "moxora");
         try {
             const response = await axios.post(
                 `https://api.cloudinary.com/v1_1/dw6d0i4oi/${fileType === "video" ? "video" : "image"}/upload`,
@@ -63,7 +63,7 @@ const PostForm = () => {
             return;
         }
         try {
-            const response = await axios.post(
+            await axios.post(
                 "http://192.168.152.18:8080/api/post/create",
                 { caption, uploadedUrl, userId },
                 {
@@ -77,6 +77,7 @@ const PostForm = () => {
             setCaption('');
             setCapturedFile(null);
             setUploadedUrl(null)
+            router.back();
         } catch (error) {
             console.error("Error posting:", error.response?.data || error.message);
         }

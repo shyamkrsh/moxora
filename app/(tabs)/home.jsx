@@ -1,20 +1,22 @@
 import { View, Text, Image, StyleSheet, FlatList, Pressable } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FollowerIconCard from '../../components/FollowerIconCard';
 import Feather from '@expo/vector-icons/Feather';
 import PostCard from '../../components/PostCard';
 import axios from 'axios'
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Home = () => {
-
+  const [posts, setPosts] = useState([]);
   const router = useRouter();
+
 
   useEffect(() => {
     axios.get("http://192.168.152.18:8080/api/post/all").then((res) => {
-      console.log(res.data)
+      setPosts(res.data);
     }).catch((err) => {
       console.log(err);
     })
@@ -37,9 +39,9 @@ const Home = () => {
       </View>
       <View style={{ width: "100%", height: 1, backgroundColor: '#e8e6e1' }}></View>
       <FlatList
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9]} // Post data
+        data={posts} // Post data
         keyExtractor={(item) => item.toString()}
-        renderItem={({ item }) => <PostCard profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
+        renderItem={({ item }) => <PostCard itemInfo={item} profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
         showsVerticalScrollIndicator={false}
 
       />

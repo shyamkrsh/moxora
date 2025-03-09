@@ -1,23 +1,64 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 
 const Index = () => {
 
+    const [currUserInfo, setCurrUserInfo] = useState({});
+
+
+    useEffect(() => {
+
+        (async function () {
+            const token = await AsyncStorage.getItem('token');
+            const userId = await AsyncStorage.getItem('userId');
+            if (!token || !userId) {
+                console.error("Error: User not authenticated.");
+                return;
+            }
+            console.log("UserId - ", userId, "  ", token);
+            await axios.post(
+                "http://192.168.152.18:8080/api/user/userDetails",
+                { userId },
+                {
+                    headers: {
+                        "Authorization": `${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                }
+            ).then((res) => {
+                setCurrUserInfo(res.data.data)
+            }).catch((err) => {
+                console.log(err);
+            })
+        })();
+
+    }, []);
     const router = useRouter();
+
+
+    let handleLogout = async() => {
+        await AsyncStorage.removeItem("token");
+        router.navigate("/");
+    }
 
     return (
         <>
             <View style={styles.profileMainContainer}>
                 <View style={styles.header}>
                     <AntDesign name="left" size={24} color="black" onPress={() => router.back()} />
-                    <Text style={styles.name}>Rakesh Kumar</Text>
-                    <Ionicons name="search" size={24} color="#515452" style={styles.searchIcon} />
+                    <Text style={styles.name}>{currUserInfo?.emailOrMobile}</Text>
+                    <Pressable onPress={handleLogout}>
+                        <Text style={styles.logoutBtn}>Logout</Text>
+                    </Pressable>
                 </View>
                 <View style={styles.profileImages}>
                     <Image source={{ uri: "https://i.ibb.co/VkGpbMw/3607424.jpg" }} style={styles.profileBgImg} />
@@ -26,8 +67,8 @@ const Index = () => {
                     </View>
                 </View>
                 <View style={styles.userBio}>
-                    <Text style={styles.name}>Rakesh Kumar</Text>
-                    <Text style={{ color: 'gray', fontSize: 18, fontWeight: 500, width: "70%", textAlign: 'center' }}>Full Stack Developer, React Native, Node js</Text>
+                    <Text style={styles.name}>{currUserInfo?.emailOrMobile}</Text>
+                    <Text style={{ color: 'gray', fontSize: 18, fontWeight: 500, width: "70%", textAlign: 'center' }}>{currUserInfo?.bio}</Text>
                 </View>
                 <View style={styles.followActions}>
                     <TouchableOpacity style={[styles.followActionsBtn, { backgroundColor: 'transparent' }]}>
@@ -87,11 +128,14 @@ let styles = StyleSheet.create({
         fontSize: 23,
         fontWeight: 600
     },
-    searchIcon: {
-        backgroundColor: '#d9dbda',
-        padding: 8,
-        borderRadius: 100,
-      },
+    logoutBtn: {
+        backgroundColor: '#fc0345',
+        padding: 6,
+        borderRadius: 10,
+        color: 'white',
+        fontSize : 15,
+        fontWeight : '500'
+    },
     profileImages: {
         width: "95%",
         height: 210,

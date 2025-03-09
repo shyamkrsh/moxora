@@ -10,7 +10,7 @@ const { width, height } = Dimensions.get("window");
 
 let halfWidth = width / 2;
 
-const PostCard = ({ profileImage }) => {
+const PostCard = ({itemInfo, profileImage }) => {
 
     const [showComments, setShowComments] = useState(false);
     const [likes, setLikes] = useState(0);

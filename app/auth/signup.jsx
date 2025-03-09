@@ -1,10 +1,11 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Stack, useRouter } from 'expo-router'
 import { StatusBar } from 'react-native'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Signup = () => {
@@ -15,6 +16,15 @@ const Signup = () => {
   const [showConfirmPassword, setshowConfirmPassword] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    (async function () {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        router.navigate("/home");
+      }
+    })();
+  })
+
   let handleSubmit = () => {
     console.log(emailOrMobile, " ", password);
     axios.post("http://192.168.152.18:8080/api/user/register",
@@ -23,7 +33,7 @@ const Signup = () => {
       }
     ).then((res) => {
       console.log(res.data)
-      router.navigate("./login")
+      router.push("/(tabs)/home");
     }).catch((err) => {
       console.log(err.message);
     })
