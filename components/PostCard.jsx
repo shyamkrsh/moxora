@@ -31,8 +31,7 @@ const PostCard = ({ itemInfo, profileImage }) => {
         const userId = await AsyncStorage.getItem("userId");
         setCurrUserId(userId);
         let postedById = await itemInfo.user?._id;
-        axios.post("http://192.168.152.18:8080/api/user/getPostedBy", { postedById }).then((res) => {
-            // console.log(res.data.data)
+        axios.get("http://192.168.152.18:8080/api/user/getPostedBy", {  params: { postedById } }).then((res) => {
             setPostedBy(res.data.data)
         }).catch((err) => {
             console.log(err);
@@ -41,7 +40,31 @@ const PostCard = ({ itemInfo, profileImage }) => {
 
 
     let handleDeletePost = async () => {
-        
+        const token = await AsyncStorage.getItem('token');
+        const userId = await AsyncStorage.getItem('userId');
+        let postedById = await itemInfo.user?._id;
+        let postId = itemInfo._id;
+
+        if (!token || !userId) {
+            console.error("Error: User not authenticated.");
+            return;
+        }
+        await axios.delete(
+            "http://192.168.152.18:8080/api/post/delete",
+            {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true,
+                data: { userId, postedById, postId }
+            }
+        ).then((res) => {
+            console.log("User Demo Data - ", res.data);
+        }).catch((err) => {
+            console.log(err);
+        })
+
     }
 
 
@@ -58,7 +81,7 @@ const PostCard = ({ itemInfo, profileImage }) => {
                             <Text style={styles.postedDate}>{itemInfo?.createdAt}</Text>
                         </View>
                     </View>
-                    <Button mode="contained" onPress={() => console.log("working....")} style={{ display: itemInfo?.user?._id == currUserId ? "flex" : "none" }}>
+                    <Button mode="contained" onPress={handleDeletePost} style={{ display: itemInfo?.user?._id == currUserId ? "flex" : "none" }}>
                         Delete
                     </Button>
                 </View>
