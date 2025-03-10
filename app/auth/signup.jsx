@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const Signup = () => {
+  let baseUrl = `https://moxorabackend.onrender.com`
   const [username, setUsername] = useState("");
   const [emailOrMobile, setEmailOrMobile] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +28,7 @@ const Signup = () => {
 
   let handleSubmit = () => {
     console.log(emailOrMobile, " ", password);
-    axios.post("http://192.168.152.18:8080/api/user/register",
+    axios.post(`${baseUrl}/api/user/register`,
       {
         username, emailOrMobile, password
       }

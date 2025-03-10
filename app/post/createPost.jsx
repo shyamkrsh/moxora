@@ -8,6 +8,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PostForm = () => {
+    let baseUrl = `https://moxorabackend.onrender.com`
     const [caption, setCaption] = useState('');
     const [capturedFile, setCapturedFile] = useState(null);
     const [fileType, setFileType] = useState(null);
@@ -18,27 +19,32 @@ const PostForm = () => {
     const uploadToCloudinary = async (fileUri, fileType) => {
         const data = new FormData();
         const imageTypes = ["jpg", "jpeg", "png"];
-        fileTypeFinal = fileType === "video" ? "video/mp4" :
+        const fileTypeFinal = fileType === "video" ? "video/mp4" :
             imageTypes.includes(fileType) ? `image/${fileType}` :
                 "application/octet-stream";
+
         data.append("file", {
             uri: fileUri,
             type: fileTypeFinal,
             name: fileType === "video" ? "upload.mp4" : "upload.jpg"
         });
         data.append("upload_preset", "moxora");
+
         try {
             const response = await axios.post(
                 `https://api.cloudinary.com/v1_1/dw6d0i4oi/${fileType === "video" ? "video" : "image"}/upload`,
                 data,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
-            await setUploadedUrl(response?.data?.secure_url);
+            console.log("Upload Successful: ", response?.data?.secure_url);
+            return response?.data?.secure_url;  // Return URL
         } catch (error) {
             console.error("Upload Error: ", error.response ? error.response.data : error.message);
+            return null;
         }
     };
-    const pickMedia = async () => {
+
+    let pickMedia = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
@@ -48,24 +54,32 @@ const PostForm = () => {
             setCapturedFile(result.assets[0].uri);
             setFileType(result.assets[0].type === "video" ? "video" : "image");
         }
-    };     
+    };
     const handlePost = async () => {
         if (!caption.trim() && !capturedFile) return;
+
         const token = await AsyncStorage.getItem('token');
         const userId = await AsyncStorage.getItem('userId');
         if (!token || !userId) {
             console.error("Error: User not authenticated.");
             return;
         }
-        await uploadToCloudinary(capturedFile, fileType);
-        if (!uploadedUrl) {
-            console.error("Error: Media upload failed.");
-            return;
+
+        // Wait for the upload to complete and get the URL
+        let uploadedFileUrl = null;
+        if (capturedFile) {
+            uploadedFileUrl = await uploadToCloudinary(capturedFile, fileType);
+            console.log("Uploaded File URL: ", uploadedFileUrl);
+            if (!uploadedFileUrl) {
+                console.error("Error: Upload failed.");
+                return;
+            }
         }
+
         try {
             await axios.post(
-                "http://192.168.152.18:8080/api/post/create",
-                { caption, uploadedUrl, userId },
+                `${baseUrl}/api/post/create`,
+                { caption, uploadedUrl: uploadedFileUrl, userId },
                 {
                     headers: {
                         "Authorization": `${token}`,
@@ -73,15 +87,22 @@ const PostForm = () => {
                     },
                     withCredentials: true,
                 }
-            );
+            ).then((res) => {
+                console.log(res.data);
+            }).catch((err) => {
+                console.log(err);
+            })
+
+            // Reset state after successful post
             setCaption('');
             setCapturedFile(null);
-            setUploadedUrl(null)
+            setUploadedUrl(null);
             router.back();
         } catch (error) {
             console.error("Error posting:", error.response?.data || error.message);
         }
     };
+
 
 
     return (

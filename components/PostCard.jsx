@@ -8,14 +8,12 @@ import axios from 'axios';
 import { Button } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 const { width, height } = Dimensions.get("window");
-
 let halfWidth = width / 2;
-
 const PostCard = ({ itemInfo, profileImage }) => {
-    const router = useRouter();
 
+    let baseUrl = `https://moxorabackend.onrender.com`;
+    const router = useRouter();
     const [currUserId, setCurrUserId] = useState("");
     const [postedBy, setPostedBy] = useState({});
     const [showComments, setShowComments] = useState(false);
@@ -31,26 +29,24 @@ const PostCard = ({ itemInfo, profileImage }) => {
         const userId = await AsyncStorage.getItem("userId");
         setCurrUserId(userId);
         let postedById = await itemInfo.user?._id;
-        axios.get("http://192.168.152.18:8080/api/user/getPostedBy", {  params: { postedById } }).then((res) => {
+        axios.get(`${baseUrl}/api/user/getPostedBy`, { params: { postedById } }).then((res) => {
             setPostedBy(res.data.data)
         }).catch((err) => {
             console.log(err);
         })
     })();
 
-
     let handleDeletePost = async () => {
         const token = await AsyncStorage.getItem('token');
         const userId = await AsyncStorage.getItem('userId');
         let postedById = await itemInfo.user?._id;
         let postId = itemInfo._id;
-
         if (!token || !userId) {
             console.error("Error: User not authenticated.");
             return;
         }
         await axios.delete(
-            "http://192.168.152.18:8080/api/post/delete",
+            `${baseUrl}/api/post/delete`,
             {
                 headers: {
                     "Authorization": `${token}`,
@@ -64,9 +60,7 @@ const PostCard = ({ itemInfo, profileImage }) => {
         }).catch((err) => {
             console.log(err);
         })
-
     }
-
 
     return (
         <Pressable onPress={() => router.push({ pathname: "/post/viewPost", params: { profileImage } })}>
@@ -90,11 +84,7 @@ const PostCard = ({ itemInfo, profileImage }) => {
                     </Text>
                     <View style={{ flexDirection: 'row' }}>
                         <View>
-                            <Image source={require("../assets/images/img1.jpg")} style={styles.img1} />
-                        </View>
-                        <View style={{ flexDirection: 'column', height: 180 }}>
-                            <Image source={require("../assets/images/img2.jpg")} style={styles.img2} />
-                            <Image source={require("../assets/images/img3.jpg")} style={styles.img3} />
+                            <Image source={{ uri: itemInfo?.mediaUrl }} style={styles.img1} />
                         </View>
                     </View>
                 </View>
@@ -170,19 +160,11 @@ let styles = StyleSheet.create({
         gap: 8
     },
     img1: {
-        width: halfWidth - 20,
-        height: 250
+        width: width - 19,
+        height: 250,
+        borderRadius: 10
     },
-    img2: {
-        width: halfWidth,
-        height: 125,
-        resizeMode: "stretch"
-    },
-    img3: {
-        width: halfWidth,
-        height: 125,
-        resizeMode: 'stretch'
-    },
+
     commentContainer: {
         marginTop: 12,
         borderTopWidth: 0.5,  // Only top border

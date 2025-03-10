@@ -1,15 +1,13 @@
 import { View, Text, Image, StyleSheet, FlatList, Pressable } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import FollowerIconCard from '../../components/FollowerIconCard';
-import Feather from '@expo/vector-icons/Feather';
-import PostCard from '../../components/PostCard';
-import axios from 'axios'
+import axios from 'axios';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import PostCard from '../../components/PostCard';
 
 const Home = () => {
+  let baseUrl = `https://moxorabackend.onrender.com`
   const [posts, setPosts] = useState([]);
   const [currUserInfo, setCurrUserInfo] = useState({});
   const router = useRouter();
@@ -23,7 +21,7 @@ const Home = () => {
         return;
       }
       await axios.post(
-        "http://192.168.152.18:8080/api/user/userDetails",
+        `${baseUrl}/api/user/userDetails`,
         { userId },
         {
           headers: {
@@ -33,43 +31,49 @@ const Home = () => {
           withCredentials: true,
         }
       ).then((res) => {
-        setCurrUserInfo(res.data.data)
+        setCurrUserInfo(res.data.data);
       }).catch((err) => {
         console.log(err);
-      })
+      });
     })();
   }, []);
 
   useEffect(() => {
-    axios.get("http://192.168.152.18:8080/api/post/all").then((res) => {
-      setPosts(res.data);
+    axios.get(`${baseUrl}/api/post/all`).then((res) => {
+      setPosts(res?.data?.data);
     }).catch((err) => {
       console.log(err);
-    })
-  }, [])
-
+    });
+  });
 
   return (
     <>
+      {/* Header */}
       <View style={styles.header}>
-        <View style={styles.profWithLogo}>
-          <Text style={styles.logoText}>𝑴𝒐𝒙𝒐𝒓𝒂</Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-          <Ionicons name="add-outline" size={24} color="#515452" style={styles.searchIcon} onPress={() => router.push("/post/createPost")} />
-          <Ionicons name="search-outline" size={24} color="#515452" style={styles.searchIcon} />
+        <Text style={styles.logoText}>𝑴𝒐𝒙𝒐𝒓𝒂</Text>
+        <View style={styles.iconContainer}>
+          <Pressable style={styles.iconButton} onPress={() => router.push("/post/createPost")}>
+            <Ionicons name="add-outline" size={24} color="black" />
+          </Pressable>
+          <Pressable style={styles.iconButton}>
+            <Ionicons name="search-outline" size={24} color="black" />
+          </Pressable>
           <Pressable onPress={() => router.navigate("../profile")}>
-            <Image source={{ uri: currUserInfo?.profilePic }} style={styles.profileImage} />
+            <Image source={{ uri: currUserInfo?.profilePic || "https://i.ibb.co/VYdnkZnj/profile.jpg" }} style={styles.profileImage} />
           </Pressable>
         </View>
       </View>
-      <View style={{ width: "100%", height: 1, backgroundColor: '#e8e6e1' }}></View>
-      <FlatList
-        data={posts} // Post data
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => <PostCard itemInfo={item} profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
-        showsVerticalScrollIndicator={false}
 
+      {/* Divider */}
+      <View style={styles.divider} />
+
+      {/* Posts List */}
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item._id.toString()}
+        renderItem={({ item }) => <PostCard itemInfo={item} />}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
     </>
   );
@@ -83,28 +87,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: 'white'
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  profWithLogo: {
+  logoText: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#333',
+    fontFamily: 'serif',
+  },
+  iconContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 15,
   },
+  iconButton: {
+    backgroundColor: '#f1f1f1',
+    padding: 10,
+    borderRadius: 50,
+    elevation: 2,
+  },
   profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 100,
+    width: 44,
+    height: 44,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#ddd',
   },
-  logoText: {
-    fontSize: 25,
-    fontWeight: '500',
-    color: '#050412',
+  divider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: '#e0e0e0',
   },
-  searchIcon: {
-    backgroundColor: '#d9dbda',
-    padding: 8,
-    borderRadius: 100,
-  },
-
 });

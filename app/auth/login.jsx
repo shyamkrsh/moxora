@@ -8,6 +8,7 @@ import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
+  let baseUrl = `https://moxorabackend.onrender.com`
 
   const [emailOrMobile, setEmailOrMobile] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +18,7 @@ const Login = () => {
 
   let handleSubmit = () => {
     console.log(emailOrMobile, " ", password);
-    axios.post("http://192.168.152.18:8080/api/user/login", {
+    axios.post(`${baseUrl}/api/user/login`, {
       emailOrMobile, password
     }).then(async (res) => {
       if (res?.data?.success) {

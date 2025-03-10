@@ -11,7 +11,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 const Index = () => {
-
+    let baseUrl = `https://moxorabackend.onrender.com`
     const [currUserInfo, setCurrUserInfo] = useState({});
     const [editingBio, setEditingBio] = useState(false);
     const [capturedFile, setCapturedFile] = useState(null);
@@ -29,7 +29,7 @@ const Index = () => {
             }
             console.log("UserId - ", userId, "  ", token);
             await axios.post(
-                "http://192.168.152.18:8080/api/user/userDetails",
+                `${baseUrl}/api/user/userDetails`,
                 { userId },
                 {
                     headers: {
@@ -61,9 +61,8 @@ const Index = () => {
             return;
         }
         setEditingBio(!editingBio);
-        console.log("Good boy")
         await axios.patch(
-            "http://192.168.152.18:8080/api/user/updateBio",
+            `${baseUrl}/api/user/updateBio`,
             { userId, userBio },
             {
                 headers: {
@@ -78,7 +77,6 @@ const Index = () => {
         }).catch((err) => {
             console.log(err);
         })
-        console.log("Hello")
     }
 
     // profile update functionality added
@@ -140,7 +138,7 @@ const Index = () => {
             return;
         }
         await axios.patch(
-            "http://192.168.152.18:8080/api/user/updatePic",
+            `${baseUrl}/api/user/updatePic`,
             { userId, uploadedUrl },
             {
                 headers: {
