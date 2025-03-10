@@ -5,20 +5,38 @@ import Comment from '../../components/Comment'
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get("window");
 let halfWidth = width / 2;
 
 const ViewPost = () => {
-    const { profileImage } = useLocalSearchParams();
+    let baseUrl = `https://moxorabackend.onrender.com`;
+
+    const { itemInfo } = useLocalSearchParams();
+    const [postedBy, setPostedBy] = useState({});
     const [showComments, setShowComments] = useState(true);
     const [likes, setLikes] = useState(0);
     const [liked, setLiked] = useState(false);
     const [commentCount, setCommentCount] = useState(0);
-
     const router = useRouter();
+    console.log(itemInfo);
+
+
+    (async function () {
+        let postedById = await itemInfo.user?._id;
+        axios.get(`${baseUrl}/api/user/getPostedBy`, { params: { postedById } }).then((res) => {
+            setPostedBy(res.data.data)
+        }).catch((err) => {
+            console.log(err);
+        })
+    })();
+
+
+
 
     let handleLikes = () => {
+        console.log(postedBy);
         setLikes(likes + 1);
         setLiked(!liked);
     }
@@ -41,9 +59,9 @@ const ViewPost = () => {
 
                     {/* Post Owner Info */}
                     <View style={styles.postOwnerInfo}>
-                        <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                        <Image source={{ uri: postedBy?.profilePic == null ? "https://i.ibb.co/7xx3DVQY/prof.jpg" : postedBy?.profilePic }} style={styles.profileImage} />
                         <View style={styles.ownerDetails}>
-                            <Text style={styles.ownerName}>Rakesh Kumar</Text>
+                            <Text style={styles.ownerName}>{postedBy?.username}</Text>
                             <Text style={styles.postedDate}>March 06, 2025</Text>
                         </View>
                     </View>
@@ -79,20 +97,20 @@ const ViewPost = () => {
                     </View>
 
                     {/* Comments Section */}
-                    {showComments && (
-                        <View style={styles.commentContainer}>
-                            <Comment profileImage={profileImage} />
-                            <Comment profileImage={profileImage} />
-                            <Comment profileImage={profileImage} />
-                            <Comment profileImage={profileImage} />
-                        </View>
-                    )}
+                    {/* {showComments && ( */}
+                    {/* // <View style={styles.commentContainer}>
+                        //     <Comment profileImage={profileImage} />
+                        //     <Comment profileImage={profileImage} />
+                        //     <Comment profileImage={profileImage} />
+                        //     <Comment profileImage={profileImage} />
+                        // </View> */}
+                    {/* )} */}
                 </View>
             </ScrollView>
 
             {/* Comment Input Section */}
             <View style={styles.createComment}>
-                <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                <Image source={{ uri: "" }} style={styles.profileImage} />
                 <TextInput placeholder='Write a comment...' style={styles.commentInput} />
                 <MaterialCommunityIcons name="send" size={30} color="gray" />
             </View>

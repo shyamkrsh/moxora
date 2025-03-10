@@ -63,7 +63,7 @@ const PostCard = ({ itemInfo, profileImage }) => {
     }
 
     return (
-        <Pressable onPress={() => router.push({ pathname: "/post/viewPost", params: { profileImage } })}>
+        <Pressable onPress={() => router.push({ pathname: "/post/viewPost", params: { itemInfo } })}>
             <View style={styles.postCardContainer} >
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
                     <View style={styles.postOwnerInfo}>

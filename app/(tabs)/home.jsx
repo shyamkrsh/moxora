@@ -20,15 +20,15 @@ const Home = () => {
         console.error("Error: User not authenticated.");
         return;
       }
-      await axios.post(
+      await axios.get(
         `${baseUrl}/api/user/userDetails`,
-        { userId },
         {
           headers: {
             "Authorization": `${token}`,
             "Content-Type": "application/json",
           },
           withCredentials: true,
+          data: { userId}
         }
       ).then((res) => {
         setCurrUserInfo(res.data.data);
