@@ -1,4 +1,4 @@
-import React, { cloneElement, useState } from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Button, Card } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
@@ -48,7 +48,7 @@ const PostForm = () => {
             setCapturedFile(result.assets[0].uri);
             setFileType(result.assets[0].type === "video" ? "video" : "image");
         }
-    };
+    };     
     const handlePost = async () => {
         if (!caption.trim() && !capturedFile) return;
         const token = await AsyncStorage.getItem('token');

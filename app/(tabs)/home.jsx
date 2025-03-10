@@ -11,8 +11,34 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const [currUserInfo, setCurrUserInfo] = useState({});
   const router = useRouter();
 
+  useEffect(() => {
+    (async function () {
+      const token = await AsyncStorage.getItem('token');
+      const userId = await AsyncStorage.getItem('userId');
+      if (!token || !userId) {
+        console.error("Error: User not authenticated.");
+        return;
+      }
+      await axios.post(
+        "http://192.168.152.18:8080/api/user/userDetails",
+        { userId },
+        {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      ).then((res) => {
+        setCurrUserInfo(res.data.data)
+      }).catch((err) => {
+        console.log(err);
+      })
+    })();
+  }, []);
 
   useEffect(() => {
     axios.get("http://192.168.152.18:8080/api/post/all").then((res) => {
@@ -33,7 +59,7 @@ const Home = () => {
           <Ionicons name="add-outline" size={24} color="#515452" style={styles.searchIcon} onPress={() => router.push("/post/createPost")} />
           <Ionicons name="search-outline" size={24} color="#515452" style={styles.searchIcon} />
           <Pressable onPress={() => router.navigate("../profile")}>
-            <Image source={{ uri: "https://i.ibb.co/VYdnkZnj/profile.jpg" }} style={styles.profileImage} />
+            <Image source={{ uri: currUserInfo?.profilePic }} style={styles.profileImage} />
           </Pressable>
         </View>
       </View>

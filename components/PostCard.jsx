@@ -4,40 +4,66 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Comment from './Comment';
 import { useRouter } from 'expo-router'
+import axios from 'axios';
+import { Button } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const { width, height } = Dimensions.get("window");
 
 let halfWidth = width / 2;
 
-const PostCard = ({itemInfo, profileImage }) => {
+const PostCard = ({ itemInfo, profileImage }) => {
+    const router = useRouter();
 
+    const [currUserId, setCurrUserId] = useState("");
+    const [postedBy, setPostedBy] = useState({});
     const [showComments, setShowComments] = useState(false);
     const [likes, setLikes] = useState(0);
     const [liked, setLiked] = useState(false);
     const [commentCount, setCommentCount] = useState(0);
-
-    const router = useRouter();
-
     let handleLikes = () => {
         setLikes(likes + 1);
         setLiked(!liked);
     }
 
+    (async function () {
+        const userId = await AsyncStorage.getItem("userId");
+        setCurrUserId(userId);
+        let postedById = await itemInfo.user?._id;
+        axios.post("http://192.168.152.18:8080/api/user/getPostedBy", { postedById }).then((res) => {
+            // console.log(res.data.data)
+            setPostedBy(res.data.data)
+        }).catch((err) => {
+            console.log(err);
+        })
+    })();
+
+
+    let handleDeletePost = async () => {
+        
+    }
+
+
     return (
         <Pressable onPress={() => router.push({ pathname: "/post/viewPost", params: { profileImage } })}>
             <View style={styles.postCardContainer} >
-                <View style={styles.postOwnerInfo}>
-                    <View>
-                        <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between" }}>
+                    <View style={styles.postOwnerInfo}>
+                        <View>
+                            <Image source={{ uri: postedBy?.profilePic == "" ? "https://i.ibb.co/7xx3DVQY/prof.jpg" : postedBy?.profilePic }} style={styles.profileImage} />
+                        </View>
+                        <View style={styles.ownerDetails}>
+                            <Text style={styles.ownerName}>{postedBy?.username}</Text>
+                            <Text style={styles.postedDate}>{itemInfo?.createdAt}</Text>
+                        </View>
                     </View>
-                    <View style={styles.ownerDetails}>
-                        <Text style={styles.ownerName}>Rakesh Kumar</Text>
-                        <Text style={styles.postedDate}>March 06, 2025</Text>
-                    </View>
+                    <Button mode="contained" onPress={() => console.log("working....")} style={{ display: itemInfo?.user?._id == currUserId ? "flex" : "none" }}>
+                        Delete
+                    </Button>
                 </View>
                 <View style={styles.msg}>
-                    <Text>Just landed in Bali, Indonesia, and I’m already in awe of this paradise! 🌴✨ From the breathtaking Tegallalang Rice Terraces to the crystal-clear waters of Nusa Penida, every corner of this island feels like a dream. <Text style={{ color: 'gray', fontSize: 16, fontWeight: 400 }}>more..</Text>
+                    <Text>{itemInfo?.caption} &nbsp;<Text style={{ color: 'black', fontSize: 16, fontWeight: 400 }}>more..</Text>
                     </Text>
                     <View style={{ flexDirection: 'row' }}>
                         <View>

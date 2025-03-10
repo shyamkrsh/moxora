@@ -7,13 +7,16 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
 
 
 const Index = () => {
 
-
     const [currUserInfo, setCurrUserInfo] = useState({});
     const [editingBio, setEditingBio] = useState(false);
+    const [capturedFile, setCapturedFile] = useState(null);
+    const [fileType, setFileType] = useState(null);
+    const [uploadedUrl, setUploadedUrl] = useState(null);
 
 
     useEffect(() => {
@@ -44,27 +47,19 @@ const Index = () => {
         })();
 
     }, []);
-
-
     const [userBio, setUserBio] = useState(currUserInfo?.bio);
-
     const router = useRouter();
-
-
     let handleLogout = async () => {
         await AsyncStorage.removeItem("token");
         router.navigate("/");
     }
-
     let handleUpdateBio = async () => {
-
         const token = await AsyncStorage.getItem('token');
         const userId = await AsyncStorage.getItem('userId');
         if (!token || !userId) {
             console.error("Error: User not authenticated.");
             return;
         }
-
         setEditingBio(!editingBio);
         console.log("Good boy")
         await axios.patch(
@@ -86,6 +81,86 @@ const Index = () => {
         console.log("Hello")
     }
 
+    // profile update functionality added
+
+    const pickMedia = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images, // Only allow images
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            const fileUri = result.assets[0].uri;
+            const fileExtension = fileUri.split('.').pop().toLowerCase(); // Extracts "jpg", "png", etc.
+            console.log("Externsion - ", fileExtension)
+            if (!["jpg", "jpeg", "png"].includes(fileExtension)) {
+                console.error("Invalid file type selected.");
+                return;
+            }
+            setCapturedFile(fileUri);
+            console.log(fileUri)
+            setFileType(fileExtension);
+            await uploadToCloudinary(capturedFile, fileType);
+        }
+    };
+
+    const uploadToCloudinary = async (fileUri, fileType) => {
+        const imageTypes = ["jpg", "jpeg", "png"];
+        if (!imageTypes.includes(fileType)) {
+            console.error("Invalid file type. Only JPG, JPEG, and PNG images are allowed.");
+            return;
+        }
+        const data = new FormData();
+        data.append("file", {
+            uri: fileUri,
+            type: `image/${fileType}`,
+            name: `upload.${fileType}`
+        });
+        data.append("upload_preset", "moxora");
+        try {
+            const response = await axios.post(
+                `https://api.cloudinary.com/v1_1/dw6d0i4oi/image/upload`, // Only for images
+                data,
+                { headers: { "Content-Type": "multipart/form-data" } }
+            );
+            console.log(response?.data?.secure_url)
+            await setUploadedUrl(response?.data?.secure_url);
+            await handleUpdatePic();
+        } catch (error) {
+            console.error("Upload Error: ", error.response ? error.response.data : error.message);
+        }
+    };
+
+    async function handleUpdatePic() {
+        const token = await AsyncStorage.getItem('token');
+        const userId = await AsyncStorage.getItem('userId');
+        if (!token || !userId) {
+            console.error("Error: User not authenticated.");
+            return;
+        }
+        await axios.patch(
+            "http://192.168.152.18:8080/api/user/updatePic",
+            { userId, uploadedUrl },
+            {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true,
+            }
+        ).then((res) => {
+            console.log("User Demo Data - ", res.data.data);
+            setCurrUserInfo(res.data.data)
+        }).catch((err) => {
+            console.log(err);
+        })
+
+    }
+
+
+
+
     return (
         <>
             <View style={styles.profileMainContainer}>
@@ -98,13 +173,13 @@ const Index = () => {
                 </View>
                 <View style={styles.profileImages}>
                     <Image source={{ uri: "https://i.ibb.co/VkGpbMw/3607424.jpg" }} style={styles.profileBgImg} />
-                    <View style={styles.profileImg}>
-                        <Image source={{ uri: "https://i.ibb.co/VYdnkZnj/profile.jpg" }} style={{ width: '95%', height: '95%', borderRadius: 100 }} />
-                    </View>
+                    <Pressable style={styles.profileImg} onPress={pickMedia}>
+                        <Image source={{ uri: currUserInfo?.profilePic == null ? "https://i.ibb.co/7xx3DVQY/prof.jpg" : currUserInfo?.profilePic }} style={{ width: '95%', height: '95%', borderRadius: 100 }} />
+                    </Pressable>
                 </View>
                 <View style={styles.userBio}>
                     <Text style={styles.name}>{currUserInfo?.username}</Text>
-                    <TextInput style={{ color: 'gray', fontSize: 18, fontWeight: 500, width: "70%", textAlign: 'center', borderWidth: 0.5, borderColor: editingBio ? 'black' : "white" }} value={currUserInfo?.bio ? currUserInfo?.bio : "Not available" }
+                    <TextInput style={{ color: 'gray', fontSize: 18, fontWeight: 500, width: "70%", textAlign: 'center', borderWidth: 0.5, borderColor: editingBio ? 'black' : "white" }} value={currUserInfo?.bio ? currUserInfo?.bio : "Not available"}
                         editable={editingBio} onChangeText={(value) => setUserBio(value)} ></TextInput>
                     <TouchableOpacity onPress={() => setEditingBio(!editingBio)}>
                         <Text style={{ display: editingBio ? "none" : 'flex', backgroundColor: "blue", color: 'white', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, marginTop: 5 }}>Edit Bio</Text>
