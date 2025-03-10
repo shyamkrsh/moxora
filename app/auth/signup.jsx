@@ -6,10 +6,10 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const Signup = () => {
-
+  const [username, setUsername] = useState("");
   const [emailOrMobile, setEmailOrMobile] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +29,7 @@ const Signup = () => {
     console.log(emailOrMobile, " ", password);
     axios.post("http://192.168.152.18:8080/api/user/register",
       {
-        emailOrMobile, password
+        username, emailOrMobile, password
       }
     ).then((res) => {
       console.log(res.data)
@@ -54,6 +54,12 @@ const Signup = () => {
 
         <View style={styles.signupForm}>
 
+          <View style={styles.input}>
+            <View style={styles.inputIcons}>
+              <FontAwesome name="user-o" size={25} color="#4d5250" />
+              <TextInput placeholder='username' style={styles.inputField} onChangeText={(value) => setUsername(value)} />
+            </View>
+          </View>
           <View style={styles.input}>
             <View style={styles.inputIcons}>
               <MaterialCommunityIcons name="email-outline" size={25} color="#4d5250" />

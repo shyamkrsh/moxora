@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable, TextInput } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -11,11 +11,12 @@ import axios from 'axios';
 
 const Index = () => {
 
+
     const [currUserInfo, setCurrUserInfo] = useState({});
+    const [editingBio, setEditingBio] = useState(false);
 
 
     useEffect(() => {
-
         (async function () {
             const token = await AsyncStorage.getItem('token');
             const userId = await AsyncStorage.getItem('userId');
@@ -35,6 +36,7 @@ const Index = () => {
                     withCredentials: true,
                 }
             ).then((res) => {
+                console.log(res.data.data)
                 setCurrUserInfo(res.data.data)
             }).catch((err) => {
                 console.log(err);
@@ -42,12 +44,46 @@ const Index = () => {
         })();
 
     }, []);
+
+
+    const [userBio, setUserBio] = useState(currUserInfo?.bio);
+
     const router = useRouter();
 
 
-    let handleLogout = async() => {
+    let handleLogout = async () => {
         await AsyncStorage.removeItem("token");
         router.navigate("/");
+    }
+
+    let handleUpdateBio = async () => {
+
+        const token = await AsyncStorage.getItem('token');
+        const userId = await AsyncStorage.getItem('userId');
+        if (!token || !userId) {
+            console.error("Error: User not authenticated.");
+            return;
+        }
+
+        setEditingBio(!editingBio);
+        console.log("Good boy")
+        await axios.patch(
+            "http://192.168.152.18:8080/api/user/updateBio",
+            { userId, userBio },
+            {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true,
+            }
+        ).then((res) => {
+            console.log("User Demo Data - ", res.data.data);
+            setCurrUserInfo(res.data.data)
+        }).catch((err) => {
+            console.log(err);
+        })
+        console.log("Hello")
     }
 
     return (
@@ -55,7 +91,7 @@ const Index = () => {
             <View style={styles.profileMainContainer}>
                 <View style={styles.header}>
                     <AntDesign name="left" size={24} color="black" onPress={() => router.back()} />
-                    <Text style={styles.name}>{currUserInfo?.emailOrMobile}</Text>
+                    <Text style={styles.name}>My Profile</Text>
                     <Pressable onPress={handleLogout}>
                         <Text style={styles.logoutBtn}>Logout</Text>
                     </Pressable>
@@ -67,8 +103,15 @@ const Index = () => {
                     </View>
                 </View>
                 <View style={styles.userBio}>
-                    <Text style={styles.name}>{currUserInfo?.emailOrMobile}</Text>
-                    <Text style={{ color: 'gray', fontSize: 18, fontWeight: 500, width: "70%", textAlign: 'center' }}>{currUserInfo?.bio}</Text>
+                    <Text style={styles.name}>{currUserInfo?.username}</Text>
+                    <TextInput style={{ color: 'gray', fontSize: 18, fontWeight: 500, width: "70%", textAlign: 'center', borderWidth: 0.5, borderColor: editingBio ? 'black' : "white" }} value={currUserInfo?.bio ? currUserInfo?.bio : "Not available" }
+                        editable={editingBio} onChangeText={(value) => setUserBio(value)} ></TextInput>
+                    <TouchableOpacity onPress={() => setEditingBio(!editingBio)}>
+                        <Text style={{ display: editingBio ? "none" : 'flex', backgroundColor: "blue", color: 'white', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, marginTop: 5 }}>Edit Bio</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleUpdateBio}>
+                        <Text style={{ display: editingBio ? "flex" : 'none', backgroundColor: "green", color: 'white', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, marginTop: 5 }}>save</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.followActions}>
                     <TouchableOpacity style={[styles.followActionsBtn, { backgroundColor: 'transparent' }]}>
@@ -133,8 +176,8 @@ let styles = StyleSheet.create({
         padding: 6,
         borderRadius: 10,
         color: 'white',
-        fontSize : 15,
-        fontWeight : '500'
+        fontSize: 15,
+        fontWeight: '500'
     },
     profileImages: {
         width: "95%",

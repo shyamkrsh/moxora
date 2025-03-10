@@ -40,7 +40,7 @@ const Home = () => {
       <View style={{ width: "100%", height: 1, backgroundColor: '#e8e6e1' }}></View>
       <FlatList
         data={posts} // Post data
-        keyExtractor={(item) => item.toString()}
+        keyExtractor={(item) => item._id.toString()}
         renderItem={({ item }) => <PostCard itemInfo={item} profileImage={"https://i.ibb.co/VYdnkZnj/profile.jpg"} name={"Rohit Kumar"} />}
         showsVerticalScrollIndicator={false}
 
