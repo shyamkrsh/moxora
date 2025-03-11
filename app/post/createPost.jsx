@@ -64,8 +64,6 @@ const PostForm = () => {
             console.error("Error: User not authenticated.");
             return;
         }
-
-        // Wait for the upload to complete and get the URL
         let uploadedFileUrl = null;
         if (capturedFile) {
             uploadedFileUrl = await uploadToCloudinary(capturedFile, fileType);

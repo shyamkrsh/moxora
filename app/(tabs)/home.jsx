@@ -28,7 +28,7 @@ const Home = () => {
             "Content-Type": "application/json",
           },
           withCredentials: true,
-          data: { userId}
+          data: { userId }
         }
       ).then((res) => {
         setCurrUserInfo(res.data.data);
@@ -59,7 +59,7 @@ const Home = () => {
             <Ionicons name="search-outline" size={24} color="black" />
           </Pressable>
           <Pressable onPress={() => router.navigate("../profile")}>
-            <Image source={{ uri: currUserInfo?.profilePic || "https://i.ibb.co/VYdnkZnj/profile.jpg" }} style={styles.profileImage} />
+            <Image source={{ uri: currUserInfo?.profilePic || "https://i.ibb.co/7xx3DVQY/prof.jpg" }} style={styles.profileImage} />
           </Pressable>
         </View>
       </View>

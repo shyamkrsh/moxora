@@ -19,34 +19,31 @@ const Index = () => {
     const [uploadedUrl, setUploadedUrl] = useState(null);
 
 
-    useEffect(() => {
-        (async function () {
-            const token = await AsyncStorage.getItem('token');
-            const userId = await AsyncStorage.getItem('userId');
-            if (!token || !userId) {
-                console.error("Error: User not authenticated.");
-                return;
+    (async function () {
+        const token = await AsyncStorage.getItem('token');
+        const userId = await AsyncStorage.getItem('userId');
+        if (!token || !userId) {
+            console.error("Error: User not authenticated.");
+            return;
+        }
+        console.log("UserId - ", userId, "  ", token);
+        await axios.post(
+            `${baseUrl}/api/user/userDetails`,
+            { userId },
+            {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true,
             }
-            console.log("UserId - ", userId, "  ", token);
-            await axios.post(
-                `${baseUrl}/api/user/userDetails`,
-                { userId },
-                {
-                    headers: {
-                        "Authorization": `${token}`,
-                        "Content-Type": "application/json",
-                    },
-                    withCredentials: true,
-                }
-            ).then((res) => {
-                console.log(res.data.data)
-                setCurrUserInfo(res.data.data)
-            }).catch((err) => {
-                console.log(err);
-            })
-        })();
-
-    }, []);
+        ).then((res) => {
+            console.log(res.data.data)
+            setCurrUserInfo(res.data.data)
+        }).catch((err) => {
+            console.log(err);
+        })
+    })();
     const [userBio, setUserBio] = useState(currUserInfo?.bio);
     const router = useRouter();
     let handleLogout = async () => {
@@ -177,8 +174,8 @@ const Index = () => {
                 </View>
                 <View style={styles.userBio}>
                     <Text style={styles.name}>{currUserInfo?.username}</Text>
-                    <TextInput style={{ color: 'gray', fontSize: 18, fontWeight: 500, width: "70%", textAlign: 'center', borderWidth: 0.5, borderColor: editingBio ? 'black' : "white" }} value={currUserInfo?.bio ? currUserInfo?.bio : "Not available"}
-                        editable={editingBio} onChangeText={(value) => setUserBio(value)} ></TextInput>
+                    <TextInput style={{ color: 'gray', fontSize: 18, fontWeight: 500, width: "70%", textAlign: 'center', borderWidth: 0.5, borderColor: editingBio ? 'black' : "white" }}
+                        editable={editingBio}  onChangeText={(value) => setUserBio(value)} >{currUserInfo?.bio}</TextInput>
                     <TouchableOpacity onPress={() => setEditingBio(!editingBio)}>
                         <Text style={{ display: editingBio ? "none" : 'flex', backgroundColor: "blue", color: 'white', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, marginTop: 5 }}>Edit Bio</Text>
                     </TouchableOpacity>

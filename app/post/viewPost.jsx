@@ -1,44 +1,70 @@
 import { View, Text, StyleSheet, Image, Dimensions, Pressable, TextInput, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Comment from '../../components/Comment'
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import axios from 'axios';
+import { Video } from 'expo-av';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get("window");
 let halfWidth = width / 2;
 
 const ViewPost = () => {
     let baseUrl = `https://moxorabackend.onrender.com`;
-
+    // let baseUrl = `http://192.168.228.18:8080`;
     const { itemInfo } = useLocalSearchParams();
+    const parsedItemInfo = JSON.parse(itemInfo);
+
     const [postedBy, setPostedBy] = useState({});
     const [showComments, setShowComments] = useState(true);
     const [likes, setLikes] = useState(0);
     const [liked, setLiked] = useState(false);
-    const [commentCount, setCommentCount] = useState(0);
+    const [comment, setComment] = useState("");
+
+
     const router = useRouter();
     console.log(itemInfo);
-
+    const isVideo = (url) => {
+        return url?.match(/\.(mp4|mov|avi|wmv|flv|mkv|webm)$/i);
+    };
 
     (async function () {
-        let postedById = await itemInfo.user?._id;
-        axios.get(`${baseUrl}/api/user/getPostedBy`, { params: { postedById } }).then((res) => {
-            setPostedBy(res.data.data)
+        let postedById = await parsedItemInfo.user?._id;
+        console.log(postedById)
+        await axios.get(`${baseUrl}/api/user/getPostOwner`, { params: { postedById } }).then((res) => {
+            setPostedBy(res?.data?.data)
         }).catch((err) => {
             console.log(err);
         })
     })();
-
-
-
-
     let handleLikes = () => {
         console.log(postedBy);
         setLikes(likes + 1);
         setLiked(!liked);
+    }
+
+    let handleComment = async () => {
+        const userId = await AsyncStorage.getItem("userId");
+        const token = await AsyncStorage.getItem("token");
+        const postId = itemInfo?._id;
+        await axios.post(
+            `${baseUrl}/api/post/comment`,
+            { postId, comment, userId },
+            {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true,
+            }
+        ).then((res) => {
+            console.log(res.data);
+        }).catch((err) => {
+            console.log(err);
+        })
     }
 
     return (
@@ -62,22 +88,28 @@ const ViewPost = () => {
                         <Image source={{ uri: postedBy?.profilePic == null ? "https://i.ibb.co/7xx3DVQY/prof.jpg" : postedBy?.profilePic }} style={styles.profileImage} />
                         <View style={styles.ownerDetails}>
                             <Text style={styles.ownerName}>{postedBy?.username}</Text>
-                            <Text style={styles.postedDate}>March 06, 2025</Text>
+                            <Text style={styles.postedDate}>{postedBy?.createdAt}</Text>
                         </View>
                     </View>
 
                     {/* Post Content */}
                     <View style={styles.msg}>
                         <Text>
-                            Just landed in Bali, Indonesia, and I’m already in awe of this paradise! 🌴✨ From the breathtaking Tegallalang Rice Terraces to the crystal-clear waters of Nusa Penida, every corner of this island feels like a dream.
+                            {parsedItemInfo?.caption}
                             <Text style={{ color: 'gray', fontSize: 16, fontWeight: '400' }}> more..</Text>
                         </Text>
                         <View style={{ flexDirection: 'row' }}>
-                            <Image source={require("../../assets/images/img1.jpg")} style={styles.img1} />
-                            <View style={{ flexDirection: 'column', height: 180 }}>
-                                <Image source={require("../../assets/images/img2.jpg")} style={styles.img2} />
-                                <Image source={require("../../assets/images/img3.jpg")} style={styles.img3} />
-                            </View>
+                            {isVideo(parsedItemInfo?.mediaUrl) ? (
+                                <Video
+                                    source={{ uri: parsedItemInfo?.mediaUrl }}
+                                    style={styles.video}
+                                    useNativeControls
+                                    resizeMode="contain"
+                                    shouldPlay={false}
+                                />
+                            ) : (
+                                <Image source={{ uri: parsedItemInfo?.mediaUrl }} style={styles.img1} />
+                            )}
                         </View>
                     </View>
 
@@ -96,23 +128,20 @@ const ViewPost = () => {
                         <MaterialCommunityIcons name="share-variant-outline" size={24} color='#8b8c8b' />
                     </View>
 
-                    {/* Comments Section */}
-                    {/* {showComments && ( */}
-                    {/* // <View style={styles.commentContainer}>
-                        //     <Comment profileImage={profileImage} />
-                        //     <Comment profileImage={profileImage} />
-                        //     <Comment profileImage={profileImage} />
-                        //     <Comment profileImage={profileImage} />
-                        // </View> */}
-                    {/* )} */}
+                    <View style={styles.commentContainer}>
+                        <Comment profileImage={postedBy?.profilePic} />
+                        <Comment profileImage={postedBy?.profilePic} />
+                        <Comment profileImage={postedBy?.profilePic} />
+                        <Comment profileImage={postedBy?.profilePic} />
+                    </View>
                 </View>
             </ScrollView>
 
             {/* Comment Input Section */}
             <View style={styles.createComment}>
-                <Image source={{ uri: "" }} style={styles.profileImage} />
-                <TextInput placeholder='Write a comment...' style={styles.commentInput} />
-                <MaterialCommunityIcons name="send" size={30} color="gray" />
+                <Image source={{ uri: "https://i.ibb.co/7xx3DVQY/prof.jpg" }} style={styles.profileImage} />
+                <TextInput placeholder='Write a comment...' style={styles.commentInput} onChangeText={(value) => setComment(value)} />
+                <MaterialCommunityIcons name="send" size={30} color="gray" onPress={handleComment} />
             </View>
         </View>
     )
@@ -174,18 +203,9 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     img1: {
-        width: halfWidth - 20,
+        width: width - 19,
         height: 250,
-    },
-    img2: {
-        width: halfWidth,
-        height: 125,
-        resizeMode: "stretch",
-    },
-    img3: {
-        width: halfWidth,
-        height: 125,
-        resizeMode: 'stretch',
+        borderRadius: 10
     },
     commentContainer: {
         marginTop: 12,
@@ -214,5 +234,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#f0f5f4",
         borderRadius: 5,
         padding: 10,
+    },
+    video: {
+        width: width - 19,
+        height: 300,
+        borderRadius: 10,
     },
 });
