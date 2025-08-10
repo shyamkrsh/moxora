@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,20 +11,22 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import appLogo from "../../../assets/app-logo.png";
-import googleImg from '../../../assets/google.png'
-import facebookImg from '../../../assets/facebook.png'
+import googleImg from '../../../assets/google.png';
+import facebookImg from '../../../assets/facebook.png';
 import { navigate } from "~/navigation/NavigationService";
 import CustomButton from "~/components/CustomButton";
 import SocialButton from "~/components/SocialButton";
-
-
+import { useDispatch } from "react-redux";
+import { loginUser } from "~/features/auth/authSlice";
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
-  const [emailOrMobile, setEmailOrMobile] = useState("");
+  const [emailOrMobileOrUsername, setEmailOrMobileOrUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const [emailOrMobileError, setEmailOrMobileError] = useState("");
+  const [emailOrMobileOrUsernameError, setEmailOrMobileOrUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const dispatch = useDispatch();
 
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -32,15 +34,17 @@ export default function LoginScreen() {
   const isValidPhone = (phone) =>
     /^\d{10,15}$/.test(phone);
 
-  const handleEmailOrMobileChange = (text) => {
-    setEmailOrMobile(text);
+  const handleEmailOrMobileOrUsernameChange = (text) => {
+    setEmailOrMobileOrUsername(text);
 
     if (!text) {
-      setEmailOrMobileError("Email or mobile is required");
+      setEmailOrMobileOrUsernameError("Email, mobile or username is required");
     } else if (!(isValidEmail(text) || isValidPhone(text))) {
-      setEmailOrMobileError("Enter a valid email or mobile number");
+      // Since username can be anything, you might want to relax validation here.
+      // For now, if it doesn't look like email or phone, assume username (so no error).
+      setEmailOrMobileOrUsernameError("");
     } else {
-      setEmailOrMobileError("");
+      setEmailOrMobileOrUsernameError("");
     }
   };
 
@@ -57,15 +61,10 @@ export default function LoginScreen() {
   };
 
   const handleLogin = () => {
-    navigate("MainTabs");
-
     let valid = true;
 
-    if (!emailOrMobile) {
-      setEmailOrMobileError("Email or mobile is required");
-      valid = false;
-    } else if (!(isValidEmail(emailOrMobile) || isValidPhone(emailOrMobile))) {
-      setEmailOrMobileError("Enter a valid email or mobile number");
+    if (!emailOrMobileOrUsername) {
+      setEmailOrMobileOrUsernameError("Email, mobile or username is required");
       valid = false;
     }
 
@@ -79,8 +78,7 @@ export default function LoginScreen() {
 
     if (!valid) return;
 
-    console.log({ emailOrMobile, password });
-    // Add your login logic here
+    dispatch(loginUser({ emailOrMobileOrUsername, password }));
   };
 
   const handleGoogleLogin = () => {
@@ -90,6 +88,20 @@ export default function LoginScreen() {
   const handleFacebookLogin = () => {
     console.log("Facebook login pressed");
   };
+
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await SecureStore.getItemAsync("token");
+        if (token) {
+          navigate("MainTabs");
+        }
+      } catch (error) {
+        console.error("Failed to load token from SecureStore:", error);
+      }
+    })();
+  }, []);
 
   return (
     <LinearGradient
@@ -122,23 +134,22 @@ export default function LoginScreen() {
             Sign in to continue to Moxora
           </Text>
 
-          {/* Email or Mobile */}
+          {/* Email or Mobile or Username */}
           <View className="mb-1">
-            <Text className="text-gray-300 mb-2">Email or Mobile</Text>
+            <Text className="text-gray-300 mb-2">Email, Mobile or Username</Text>
             <TextInput
-              value={emailOrMobile}
-              onChangeText={handleEmailOrMobileChange}
-              placeholder="Enter your email or phone"
+              value={emailOrMobileOrUsername}
+              onChangeText={handleEmailOrMobileOrUsernameChange}
+              placeholder="Enter your email, phone or username"
               placeholderTextColor="#aaa"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-              autoComplete="email"
-              importantForAutofill="no"
-              className={`bg-white/10 text-white px-4 py-3 rounded-xl border ${emailOrMobileError ? "border-red-500" : "border-white/20"
+              keyboardType="default"
+              textContentType="username"
+              autoComplete="username"
+              className={`bg-white/10 text-white px-4 py-3 rounded-xl border ${emailOrMobileOrUsernameError ? "border-red-500" : "border-white/20"
                 }`}
             />
-            {emailOrMobileError ? (
-              <Text className="text-red-500 mt-1">{emailOrMobileError}</Text>
+            {emailOrMobileOrUsernameError ? (
+              <Text className="text-red-500 mt-1">{emailOrMobileOrUsernameError}</Text>
             ) : null}
           </View>
 

@@ -1,3 +1,7 @@
+
+.env.development
+.env.preview
+.env.production
 node_modules/
 .expo/
 dist/

@@ -1,0 +1,23 @@
+{
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "ENVFILE": ".env.development"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "ENVFILE": ".env.preview"
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "env": {
+        "ENVFILE": ".env.production"
+      }
+    }
+  }
+}
